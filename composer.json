@@ -1,0 +1,29 @@
+{
+    "name": "umirode/status",
+    "homepage": "https://github.com/umirode/status",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "umirode",
+            "email": "mr.droiderm@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.1",
+        "beberlei/assert": "^3.2"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7.0.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Umirode\\Status\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Umirode\\Status\\Test\\": "test/",
+            "Umirode\\Status\\Example\\": "example/"
+        }
+    }
+}
