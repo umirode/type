@@ -13,11 +13,11 @@ use PHPUnit\Framework\TestCase;
 use Umirode\Status\Example\ProductStatus;
 
 /**
- * Class StatusTest
+ * Class ProductStatusTest
  *
  * @package Umirode\Status\Test
  */
-final class StatusTest extends TestCase
+final class ProductStatusTest extends TestCase
 {
     public function testCreateActiveById(): void
     {
