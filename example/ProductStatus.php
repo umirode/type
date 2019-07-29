@@ -18,9 +18,11 @@ use Umirode\Status\Status;
  *
  * @method bool isActive()
  * @method bool isInactive()
+ * @method bool isTest()
  *
  * @method static ProductStatus active()
  * @method static ProductStatus inactive()
+ * @method static ProductStatus test()
  */
 final class ProductStatus extends Status
 {
@@ -32,6 +34,7 @@ final class ProductStatus extends Status
         return [
             1 => ['Active', 'active'],
             2 => ['Inactive', 'inactive'],
+            'test' => ['Test', 'test'],
         ];
     }
 }

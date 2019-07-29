@@ -85,4 +85,13 @@ final class ProductStatusTest extends TestCase
         $this->assertTrue($status->isInactive());
         $this->assertFalse($status->isActive());
     }
+
+    public function testStringId(): void {
+        $status = ProductStatus::test();
+
+        $this->assertTrue($status->isTest());
+        $this->assertFalse($status->isActive());
+
+        $this->assertEquals('test', $status->getId());
+    }
 }

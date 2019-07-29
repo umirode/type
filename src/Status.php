@@ -19,16 +19,16 @@ use Assert\Assert;
 abstract class Status
 {
     /**
-     * @var int
+     * @var int|string
      */
     protected $id;
 
     /**
      * Status constructor.
      *
-     * @param int $id
+     * @param int|string $id
      */
-    protected function __construct(int $id)
+    public function __construct($id)
     {
         $this->id = $id;
     }
@@ -43,9 +43,9 @@ abstract class Status
     abstract public static function getList(): array;
 
     /**
-     * @return int
+     * @return int|string
      */
-    public function getId(): int
+    public function getId()
     {
         return $this->id;
     }
@@ -61,11 +61,11 @@ abstract class Status
     }
 
     /**
-     * @param int $id
+     * @param int|string $id
      *
      * @return static
      */
-    public static function create(int $id)
+    public static function create($id)
     {
         static::checkId($id);
 
@@ -73,9 +73,9 @@ abstract class Status
     }
 
     /**
-     * @param int $id
+     * @param int|string $id
      */
-    protected static function checkId(int $id): void
+    protected static function checkId($id): void
     {
         Assert::that($id)->inArray(array_keys(static::getList()));
     }
@@ -83,10 +83,10 @@ abstract class Status
     /**
      * @param $slug
      *
-     * @return int
+     * @return int|string
      * @throws \Exception
      */
-    protected static function getIdBySlug($slug): int
+    protected static function getIdBySlug($slug)
     {
         foreach (static::getList() as $key => $status) {
             if ($status[1] === $slug) {
