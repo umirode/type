@@ -105,7 +105,7 @@ abstract class Status
     {
         static::checkId($this->id);
 
-        static::getList()[$this->id][1];
+        return static::getList()[$this->id][1];
     }
 
     /**

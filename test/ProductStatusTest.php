@@ -94,4 +94,13 @@ final class ProductStatusTest extends TestCase
 
         $this->assertEquals('test', $status->getId());
     }
+
+    public function testGetSlug(): void {
+        $status = ProductStatus::test();
+
+        $this->assertTrue($status->isTest());
+        $this->assertFalse($status->isActive());
+
+        $this->assertEquals('test', $status->getSlug());
+    }
 }
