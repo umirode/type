@@ -75,8 +75,9 @@ abstract class Status
     /**
      * @param int|string $id
      */
-    protected static function checkId($id): void
+    protected static function checkId(&$id): void
     {
+        $id = is_numeric($id) ? (int)$id : $id;
         Assert::that($id)->inArray(array_keys(static::getList()));
     }
 
