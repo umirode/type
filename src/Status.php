@@ -107,7 +107,7 @@ abstract class Status
     public function __call($name, $arguments)
     {
         if (preg_match('/is[A-Z]\w+/', $name)) {
-            $slug = strtolower(explode('is', $name)[1]);
+            $slug = lcfirst(explode('is', $name)[1]);
 
             return $this->id === static::getIdBySlug($slug);
         }
