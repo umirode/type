@@ -99,6 +99,16 @@ abstract class Status
     }
 
     /**
+     * @return string
+     */
+    public function getSlug(): string
+    {
+        static::checkId($this->id);
+
+        static::getList()[$this->id][1];
+    }
+
+    /**
      * @param $name
      * @param $arguments
      *
