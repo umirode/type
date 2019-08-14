@@ -57,7 +57,9 @@ abstract class Status
     {
         static::checkId($this->id);
 
-        return static::getList()[$this->id][0];
+        $status = static::getList()[$this->id];
+
+        return is_array($status) ? $status[0] : $status;
     }
 
     /**
@@ -90,7 +92,10 @@ abstract class Status
     protected static function getIdBySlug($slug)
     {
         foreach (static::getList() as $key => $status) {
-            if ($status[1] === $slug) {
+            if (is_array($status) && $status[1] === $slug) {
+                return $key;
+            }
+            if ($slug === $key || (int)$slug === $key) {
                 return $key;
             }
         }
@@ -105,7 +110,9 @@ abstract class Status
     {
         static::checkId($this->id);
 
-        return static::getList()[$this->id][1];
+        $status = static::getList()[$this->id];
+
+        return is_array($status) ? $status[1] : $this->id;
     }
 
     /**

@@ -86,7 +86,8 @@ final class ProductStatusTest extends TestCase
         $this->assertFalse($status->isActive());
     }
 
-    public function testStringId(): void {
+    public function testStringId(): void
+    {
         $status = ProductStatus::test();
 
         $this->assertTrue($status->isTest());
@@ -95,12 +96,37 @@ final class ProductStatusTest extends TestCase
         $this->assertEquals('test', $status->getId());
     }
 
-    public function testGetSlug(): void {
+    public function testGetSlug(): void
+    {
         $status = ProductStatus::test();
 
         $this->assertTrue($status->isTest());
         $this->assertFalse($status->isActive());
 
         $this->assertEquals('test', $status->getSlug());
+    }
+
+    public function testStatusWithoutSlug(): void
+    {
+        $status = ProductStatus::test1();
+
+        $this->assertTrue($status->isTest1());
+        $this->assertFalse($status->isTest());
+        $this->assertFalse($status->isActive());
+
+        $this->assertEquals('test1', $status->getSlug());
+    }
+
+    public function testCreate(): void
+    {
+        $statusesIds = array_keys(ProductStatus::getList());
+
+        foreach ($statusesIds as $statusId) {
+            $status = ProductStatus::create($statusId);
+
+            $this->assertNotEmpty($status->getId());
+            $this->assertNotEmpty($status->getTitle());
+            $this->assertNotEmpty($status->getSlug());
+        }
     }
 }
