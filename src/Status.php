@@ -47,7 +47,7 @@ abstract class Status
      */
     public function getId()
     {
-        return $this->id;
+        return is_numeric($this->id) ? (int)$this->id : $this->id;
     }
 
     /**
@@ -59,7 +59,7 @@ abstract class Status
 
         $status = static::getList()[$this->id];
 
-        return is_array($status) ? $status[0] : $status;
+        return is_array($status) ? $status[0] : (string)$status;
     }
 
     /**
@@ -112,7 +112,7 @@ abstract class Status
 
         $status = static::getList()[$this->id];
 
-        return is_array($status) ? $status[1] : $this->id;
+        return is_array($status) ? $status[1] : (string)$this->id;
     }
 
     /**
