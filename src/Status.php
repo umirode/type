@@ -30,7 +30,7 @@ abstract class Status
      */
     public function __construct($id)
     {
-        $this->id = $id;
+        $this->id = static::formatStringOrInt($id);
     }
 
     /**
@@ -47,7 +47,15 @@ abstract class Status
      */
     public function getId()
     {
-        return is_numeric($this->id) ? (int)$this->id : $this->id;
+        return $this->id;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->getTitle();
     }
 
     /**
@@ -55,15 +63,15 @@ abstract class Status
      */
     public function getTitle(): string
     {
-        static::checkId($this->id);
+        static::checkId($this->getId());
 
-        $status = static::getList()[$this->id];
+        $status = static::getList()[$this->getId()];
 
-        return is_array($status) ? $status[0] : (string)$status;
+        return (string)(is_array($status) ? $status[0] : $status);
     }
 
     /**
-     * @param int|string $id
+     * @param $id
      *
      * @return static
      */
@@ -75,12 +83,11 @@ abstract class Status
     }
 
     /**
-     * @param int|string $id
+     * @param $id
      */
-    protected static function checkId(&$id): void
+    protected static function checkId($id): void
     {
-        $id = is_numeric($id) ? (int)$id : $id;
-        Assert::that($id)->inArray(array_keys(static::getList()));
+        Assert::that(static::formatStringOrInt($id))->inArray(array_keys(static::getList()));
     }
 
     /**
@@ -91,11 +98,12 @@ abstract class Status
      */
     protected static function getIdBySlug($slug)
     {
+        $slug = static::formatStringOrInt($slug);
+
         foreach (static::getList() as $key => $status) {
-            if (is_array($status) && $status[1] === $slug) {
-                return $key;
-            }
-            if ($slug === $key || (int)$slug === $key) {
+            $key = static::formatStringOrInt($key);
+
+            if (($slug === $key) || (is_array($status) && $status[1] === $slug)) {
                 return $key;
             }
         }
@@ -104,22 +112,32 @@ abstract class Status
     }
 
     /**
+     * @param $value
+     *
+     * @return int|string
+     */
+    protected static function formatStringOrInt($value)
+    {
+        return is_numeric($value) ? (int)$value : (string)$value;
+    }
+
+    /**
      * @return string
      */
     public function getSlug(): string
     {
-        static::checkId($this->id);
+        static::checkId($this->getId());
 
-        $status = static::getList()[$this->id];
+        $status = static::getList()[$this->getId()];
 
-        return is_array($status) ? $status[1] : (string)$this->id;
+        return (string)(is_array($status) ? $status[1] : $this->getId());
     }
 
     /**
      * @param $name
      * @param $arguments
      *
-     * @return Status|bool
+     * @return bool
      * @throws \Exception
      */
     public function __call($name, $arguments)
@@ -127,7 +145,7 @@ abstract class Status
         if (preg_match('/is[A-Z]\w+/', $name)) {
             $slug = lcfirst(explode('is', $name)[1]);
 
-            return $this->id === static::getIdBySlug($slug);
+            return $this->getId() === static::getIdBySlug($slug);
         }
 
         throw new \Exception('Method not exists');
