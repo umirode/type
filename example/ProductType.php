@@ -6,27 +6,27 @@
  * Time: 15:26
  */
 
-namespace Umirode\Status\Example;
+namespace Umirode\Type\Example;
 
 
-use Umirode\Status\Status;
+use Umirode\Type\Type;
 
 /**
- * Class ProductStatus
+ * Class ProductType
  *
- * @package Umirode\Status\Example
+ * @package Umirode\Type\Example
  *
  * @method bool isActive()
  * @method bool isInactive()
  * @method bool isTest()
  * @method bool isTest1()
  *
- * @method static ProductStatus active()
- * @method static ProductStatus inactive()
- * @method static ProductStatus test()
- * @method static ProductStatus test1()
+ * @method static ProductType active()
+ * @method static ProductType inactive()
+ * @method static ProductType test()
+ * @method static ProductType test1()
  */
-final class ProductStatus extends Status
+final class ProductType extends Type
 {
     /**
      * @return array
