@@ -14,3 +14,42 @@ Using Composer:
 ```sh
 composer require umirode/type
 ```
+
+## Example
+
+Define type:
+```php
+<?php declare(strict_types=1);
+
+use Umirode\Type\Type;
+
+/**
+ * Class ExampleType
+ * @package Umirode\Type
+ *
+ * @method bool isActive()
+ * @method bool isAccepted()
+ * @method bool isCanceledByCustomer()
+ * @method static ExampleType active()
+ * @method static ExampleType accepted()
+ * @method static ExampleType canceledByCustomer()
+ */
+final class ExampleType extends Type
+{
+    public const TYPES = [
+        'active' => 'Active',
+        'accepted' => 'Accepted by admin',
+        'canceled_by_customer' => 'Canceled by customer'
+    ];
+}
+```
+
+Use it:
+```php
+<?php
+
+$exampleType = new ExampleType('canceled_by_customer');
+$exampleType = ExampleType::canceledByCustomer();
+
+echo $exampleType->getValue(); // Canceled by customer
+```

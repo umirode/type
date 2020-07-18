@@ -1,182 +1,141 @@
-<?php
-/**
- * Created by IntelliJ IDEA.
- * User: maksim
- * Date: 2020-02-17
- * Time: 11:50
- */
+<?php declare(strict_types=1);
+
 
 namespace Umirode\Type;
 
 
+use Assert\Assertion;
+use Jawira\CaseConverter\CaseConverterException;
 use Jawira\CaseConverter\Convert;
 
 /**
  * Class Type
- *
  * @package Umirode\Type
  */
 abstract class Type
 {
-    /**
-     * @var array
-     */
-    protected $currentType;
+    public const TYPES = [];
 
     /**
-     * @var array|null
+     * @var string
      */
-    protected static $formattedList;
+    private $identifier;
 
     /**
-     * @var array
+     * @var mixed
      */
-    protected static $typesCache = [];
+    private $value;
 
     /**
-     * @return array
+     * Type constructor.
+     * @param string $identifier
+     * @throws CaseConverterException
      */
-    abstract protected static function getList(): array;
-
-    /**
-     * NewType constructor.
-     *
-     * @param $identifier
-     *
-     * @throws \Exception
-     */
-    public function __construct($identifier)
+    final public function __construct(string $identifier)
     {
-        $this->currentType = static::findType($identifier);
-    }
+        $this->identifier = $this->convertToSnakeCase($identifier);
 
-    /**
-     * @param $identifier
-     *
-     * @return static
-     * @throws \Exception
-     */
-    public static function create($identifier) {
-        return new static($identifier);
-    }
+        $this->validateTypes();
+        $this->validateIdentifier($this->identifier);
 
-    /**
-     * @return int|null
-     */
-    public function getId(): ?int
-    {
-        return $this->currentType['id'] ?? null;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getSlug(): ?string
-    {
-        return $this->currentType['slug'] ?? null;
+        $this->value = static::TYPES[$this->identifier];
     }
 
     /**
      * @return string
      */
-    public function getTitle(): string
+    final public function getIdentifier(): string
     {
-        return $this->currentType['title'];
+        return $this->identifier;
     }
 
     /**
+     * @return mixed
+     */
+    final public function getValue()
+    {
+        return $this->value;
+    }
+
+    /**
+     * @param string $value
      * @return string
+     * @throws CaseConverterException
      */
-    public function __toString()
+    private function convertToSnakeCase(string $value): string
     {
-        return $this->getTitle();
+        return (new Convert($value))->toSnake();
     }
 
     /**
-     * @param $identifier
-     *
-     * @return array|null
-     * @throws \Exception
+     * @throws CaseConverterException
      */
-    private static function findType($identifier): ?array
+    private function validateTypes(): void
     {
-        $type = static::$typesCache[$identifier] ?? null;
-        if ($type !== null) {
-            return $type;
-        }
+        $errorMessage = 'Const TYPES must be not empty assoc array';
 
-        $list = static::getFormattedList();
-        foreach ($list as $item) {
-            if ($item['id'] === $identifier || $item['slug'] === $identifier) {
-                static::$typesCache[$identifier] = $item;
-                return $item;
-            }
-        }
+        Assertion::true($this->isAssocArray(static::TYPES), $errorMessage);
+        Assertion::notEmpty(static::TYPES, $errorMessage);
 
-        throw new \Exception('Type ' . $identifier . ' not exists');
+        foreach (static::TYPES as $type => $value) {
+            $convertedType = $this->convertToSnakeCase($type);
+
+            Assertion::true(
+                $convertedType === $type,
+                'Keys for TYPES must be in snake_case, use "' . $convertedType . '" instead "' . $type . '"'
+            );
+        }
     }
 
     /**
-     * @return array
-     * @throws \Jawira\CaseConverter\CaseConverterException
+     * @param string $identifier
      */
-    private static function getFormattedList(): array
+    private function validateIdentifier(string $identifier): void
     {
-        if (static::$formattedList !== null) {
-            return static::$formattedList;
-        }
-
-        static::$formattedList = [];
-
-        $list = static::getList();
-        foreach ($list as $key => $item) {
-            $id = is_int($key) ? $key : null;
-            $slug = is_string($key) ? $key : null;
-            $title = $item;
-
-            if (is_array($item) && count($item) === 2) {
-                [$title, $slug] = $item;
-            }
-
-            $slug = (new Convert($slug))->toCamel();
-
-            static::$formattedList [] = [
-                'id' => $id,
-                'slug' => $slug,
-                'title' => $title,
-            ];
-        }
-
-        return static::$formattedList;
+        Assertion::inArray(
+            $identifier,
+            array_keys(static::TYPES),
+            'Invalid type "' . $identifier . '", please define this type in TYPES const'
+        );
     }
 
     /**
-     * @param $name
-     * @param $arguments
-     *
+     * @param array $array
      * @return bool
-     * @throws \Exception
      */
-    public function __call($name, $arguments)
+    private function isAssocArray(array $array): bool
     {
-        if (preg_match('/is[A-Z]\w+/', $name)) {
-            $slug = lcfirst(explode('is', $name)[1]);
-
-            return $this->getSlug() === $slug;
+        if ([] === $array) {
+            return false;
         }
 
-        throw new \Exception('Method not exists');
+        return array_keys($array) !== range(0, count($array) - 1);
     }
 
     /**
-     * @param $name
-     * @param $arguments
-     *
-     * @return Type
-     * @throws \Exception
+     * @param string $name
+     * @param array $arguments
+     * @return bool
+     * @throws CaseConverterException
      */
-    public static function __callStatic($name, $arguments)
+    final public function __call(string $name, array $arguments = []): bool
     {
-        return static::create($name);
+        Assertion::notEq(false, preg_match('/is[A-Za-z]\w+/', $name), 'Invalid method "' . $name . '"');
+
+        $identifier = $this->convertToSnakeCase(lcfirst(explode('is', $name)[1]));
+        $this->validateIdentifier($identifier);
+
+        return $this->identifier === $identifier;
+    }
+
+    /**
+     * @param string $name
+     * @param array $arguments
+     * @return static
+     * @throws CaseConverterException
+     */
+    final public static function __callStatic(string $name, array $arguments = []): self
+    {
+        return new static($name);
     }
 }
